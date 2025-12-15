@@ -14,6 +14,8 @@ class MealAdapter : RecyclerView.Adapter<MealAdapter.MealViewHolder>() {
 
     private var mealList = emptyList<Meal>()
 
+    var onMealClick: ((Meal) -> Unit)? = null
+
     inner class MealViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val mealImage: ImageView = itemView.findViewById(R.id.mealImage)
         val mealName: TextView = itemView.findViewById(R.id.mealName)
@@ -33,6 +35,10 @@ class MealAdapter : RecyclerView.Adapter<MealAdapter.MealViewHolder>() {
             crossfade(true)
             placeholder(R.drawable.ic_launcher_background)
             error(R.drawable.ic_launcher_background)
+        }
+
+        holder.itemView.setOnClickListener {
+            onMealClick?.invoke(currentMeal)
         }
     }
 

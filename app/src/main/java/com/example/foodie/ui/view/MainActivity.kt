@@ -1,5 +1,6 @@
-package com.example.foodie
+package com.example.foodie.ui.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.foodie.R
 import com.example.foodie.ui.adapter.MealAdapter
 import com.example.foodie.ui.viewmodel.MealViewModel
 
@@ -48,6 +50,12 @@ class MainActivity : AppCompatActivity() {
         mealAdapter = MealAdapter()
         recyclerView.adapter = mealAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        mealAdapter.onMealClick = { meal ->
+            val intent = Intent(this, DetailActivity::class.java)
+            intent.putExtra("MEAL_DATA", meal)
+            startActivity(intent)
+        }
     }
 
     private fun observeMealsLiveData() {
