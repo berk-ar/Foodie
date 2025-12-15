@@ -2,16 +2,24 @@ package com.example.foodie
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.ProgressBar
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.foodie.ui.adapter.MealAdapter
 import com.example.foodie.ui.viewmodel.MealViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: MealViewModel by viewModels()
+    private lateinit var mealAdapter: MealAdapter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,27 +31,37 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        recyclerView = findViewById(R.id.rv)
+        progressBar = findViewById(R.id.progressBar)
+
+        // rv kurulumu
+        setupRecyclerView()
+
+        // veriyi gözlemler
         observeMealsLiveData()
 
         viewModel.searchMeals("cake")
+        progressBar.visibility = View.VISIBLE
+    }
+
+    private fun setupRecyclerView() {
+        mealAdapter = MealAdapter()
+        recyclerView.adapter = mealAdapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
     }
 
     private fun observeMealsLiveData() {
         viewModel.mealResponse.observe(this) { response ->
+            progressBar.visibility = View.GONE
             if (response.isSuccessful) {
                 val meals = response.body()?.meals
-
-                if (meals.isNullOrEmpty()) {
-                    Log.d("Foodie", "Hiçbir yemek bulunamadı")
+                if (meals != null) {
+                    mealAdapter.setMeals(meals)
                 } else {
-                    Log.d("Foodie", "Başarılı ${meals.size} adet yemek bulundu")
-
-                    meals.forEach { m ->
-                        Log.d("Foodie", "Yemek adı ${m.name}, ID: ${m.id}")
-                    }
+                    Log.d("Foodie", "Liste boş geldi")
                 }
             } else {
-                Log.e("Foodie", "API isteği başarısız oldu: ${response.code()}")
+                Log.e("Foodie", "Hata: ${response.code()}")
             }
         }
     }
